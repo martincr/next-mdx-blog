@@ -1,83 +1,100 @@
 # MDX Static Blog Template
 
-MDX Blog Template is a simple implementation of a markdown static blog. Built with Next.js 14 and velite js.
+A markdown static blog built with Next.js 15, MDX, and Tailwind CSS. Luxury minimal aesthetic with an editorial serif/sans/mono type stack.
 
-<img src="screenshot/mdx-blog-template.jpg" alt="Dashboard" width="100%">
+<img src="screenshot/mdx-blog-template.jpg" alt="MDX Blog Template" width="100%">
 
 ## Table of Contents
 
 - [Features](#features)
-
-- [Used Technologies](#used-technologies)
-
+- [Technologies](#technologies)
 - [Run Locally](#run-locally)
+- [Adding Blog Posts](#adding-blog-posts)
 
 ## Features
 
-- MDX Components
+- **Luxury minimal design** — warm near-neutral palette, single amber accent, no visual clutter
+- **Editorial typography** — DM Serif Display headings, Lexend body, GeistMono code
+- **MDX content** with syntax highlighting (Dracula theme via rehype-pretty-code)
+- **Dark / light mode** toggle (defaults to dark, respects system preference)
+- **Reading time** on every post
+- **Table of contents** — sticky left-column sidebar on post pages (lg+)
+- **Tag filtering** on the blog listing page
+- **RSS feed** at `/feed.xml`
+- **Responsive** — mobile-first, two-column post layout on large screens
+- Static generation via `generateStaticParams`
 
-- Responsive design built using `shadcn/ui` and `tailwindcss`
+## Technologies
 
-- Syntax Highlighting of code.
-
-## Used Technologies
-
-- `Next.js`: Harness the power of Next.js, leveraging its static site generation (SSG) capabilities to create a user interface.
-
-- `shadcn/ui`: Enhance your app's visual and interactive elements with components from shadcn/ui. These beautifully designed components can be seamlessly integrated into your application, offering accessibility, customizability, and open-source goodness.
-
-- `Tailwind CSS`: Employ Tailwind CSS for efficient styling, enabling rapid development through its utility-first approach and streamlined design workflow.
-
-- `Markdown`: MDX lets you use JSX in your markdown content. You can import components, such as interactive charts or alerts, and embed them within your content.
-
-- `Velite`: Velite is a tool for building type-safe data layer, turn Markdown / MDX, YAML, JSON, or other files into app's data layer with Zod schema.
+- **Next.js 15** — App Router, static site generation
+- **React 19**
+- **next-mdx-remote** — MDX compilation via React Server Components
+- **gray-matter** — frontmatter parsing
+- **next-themes** — dark/light mode
+- **DM Serif Display** — editorial display font (Google Fonts)
+- **rehype-pretty-code** — syntax highlighting
+- **shadcn/ui** — UI primitives
+- **Tailwind CSS v3** — utility-first styling
 
 ## Run Locally
 
-To get a copy of MDX Blog Template up and running on your local machine, follow these steps:
-
-1. **Clone the repository**:
+1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/devbertskie/next-mdx-blog.git
-   ```
-
-   After successful cloned. Head over to the project directory
-
-   ```bash
+   git clone https://github.com/martincr/next-mdx-blog.git
    cd next-mdx-blog
    ```
 
-2. **Install Dependencies**:
-
-   Navigate into the project directory and install the required dependencies:
+2. **Install dependencies**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
-3. **Run the Development Server**:
-
-   Start the app in development mode with the following command:
+3. **Start the development server**
 
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
-   Head over to your browser and access the `localhost:3000`
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-4. **Build the App**:
-
-   To build the app, run the following command:
+4. **Build for production**
 
    ```bash
-   npm run build
+   pnpm build
    ```
 
+## Adding Blog Posts
+
+Add `.mdx` files to `src/content/blog/`. Use kebab-case filenames (e.g. `my-new-post.mdx`).
+
+Each file requires this frontmatter:
+
+```yaml
 ---
+title: "Post title"
+description: "Short description"
+image: "/images/blog/my-image.webp"
+date: "2024-06-01"
+author: "your-name"
+tags: ["typescript", "react"]
+---
+```
 
-- **Add New Blog Content**:
+- `published: false` hides a post from the listing without deleting it
+- `tags` is optional — when present, tag filter buttons appear on the blog page
+- `image` path is relative to the `public/` directory
+- The slug is derived from the filename: `my-new-post.mdx` → `/blog/my-new-post`
 
-  To add new blog content, go to `content` folder and you can add new markdown component in `.mdx` file
+## Environment Variables
 
-  `Important`: Make sure to name the component with dash(`-`) and without space. Example: `my-example-blog.mdx`
+| Variable | Description | Default |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Base URL used in the RSS feed | `https://example.com` |
+
+## Customisation
+
+Edit `src/config/site.ts` to update your name, description, and social links.
+
+Edit `src/styles/globals.css` to adjust the colour palette (all values are HSL CSS custom properties).

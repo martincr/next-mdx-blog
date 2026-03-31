@@ -22,8 +22,26 @@ const config = {
     },
     extend: {
       fontFamily: {
+        serif: ["var(--font-serif)", ...fontFamily.serif],
         lexend: ["var(--font-lexend)", ...fontFamily.sans],
         code: ["var(--font-code)", ...fontFamily.sans],
+      },
+      fontSize: {
+        "display-xl": [
+          "5.5rem",
+          { lineHeight: "1.05", letterSpacing: "-0.03em" },
+        ],
+        "display-lg": [
+          "4rem",
+          { lineHeight: "1.1", letterSpacing: "-0.025em" },
+        ],
+        "display-md": [
+          "2.75rem",
+          { lineHeight: "1.15", letterSpacing: "-0.02em" },
+        ],
+      },
+      maxWidth: {
+        prose: "68ch",
       },
       colors: {
         border: "hsl(var(--border))",

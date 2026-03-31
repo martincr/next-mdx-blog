@@ -1,120 +1,104 @@
 import React from "react";
 import { Metadata } from "next";
-import { blogs as allBlogs } from "#site/content";
-import { cn, formatDate } from "@/lib/utils";
+import { notFound } from "next/navigation";
+import { getAllPosts, getPostBySlug, extractHeadings } from "@/lib/posts";
+import { formatDate } from "@/lib/utils";
 import "@/styles/mdx.css";
 
 import Image from "next/image";
-import { siteConfig } from "@/config/site";
 import { Mdx } from "@/components/mdx-component";
-import { ChevronLeft } from "lucide-react";
+import { TableOfContents } from "@/components/table-of-contents";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
 
 interface BlogPageItemProps {
-  params: {
-    slug: string[];
-  };
+  params: Promise<{ slug: string[] }>;
 }
 
 async function getBlogFromParams(params: BlogPageItemProps["params"]) {
-  const slug = params?.slug.join("/");
-  const blog = allBlogs.find((blog) => blog.slugAsParams === slug);
-
-  if (!blog) {
-    return null;
-  }
-
-  return blog;
+  const { slug } = await params;
+  return getPostBySlug(slug.join("/"));
 }
 
 export async function generateMetadata({
   params,
 }: BlogPageItemProps): Promise<Metadata> {
   const blog = await getBlogFromParams(params);
-
-  if (!blog) {
-    return {};
-  }
-
+  if (!blog) return {};
   return {
     title: blog.title,
     description: blog.description,
-    authors: {
-      name: blog.author,
-    },
+    authors: { name: blog.author },
   };
 }
 
-export async function generateStaticParams(): Promise<
-  BlogPageItemProps["params"][]
-> {
-  return allBlogs.map((blog) => ({
-    slug: blog.slugAsParams.split("/"),
-  }));
+export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ slug: post.slugAsParams.split("/") }));
 }
 
 export default async function BlogPageItem({ params }: BlogPageItemProps) {
   const blog = await getBlogFromParams(params);
 
   if (!blog) {
-    return {};
+    notFound();
   }
 
+  const headings = extractHeadings(blog.body);
+
   return (
-    <article className="container relative max-w-3xl py-6 lg:py-10">
-      <div>
+    <article className="mx-auto max-w-screen-xl px-6 lg:px-12 py-16 lg:py-20">
+      <header className="mb-16 max-w-prose">
         {blog.date && (
           <time
             dateTime={blog.date}
-            className="block text-sm text-muted-foreground"
+            className="block text-xs tracking-widest uppercase text-muted-foreground"
           >
-            Published on {formatDate(blog.date)}
+            {formatDate(blog.date)}
+            <span className="mx-3 opacity-40">/</span>
+            {blog.readingTime} min read
           </time>
         )}
-
-        <h1 className="mt-2 inline-block text-4xl font-bold capitalize leading-tight text-primary lg:text-5xl">
+        <h1 className="mt-5 font-serif text-display-md leading-tight text-foreground">
           {blog.title}
         </h1>
+        {blog.description && (
+          <p className="mt-5 max-w-[55ch] text-base leading-[1.85] text-muted-foreground">
+            {blog.description}
+          </p>
+        )}
+      </header>
 
-        {blog.author && (
-          <div className="mt-4 flex space-x-4">
-            <Image
-              src={siteConfig.authorImage}
-              alt={blog.author}
-              width={42}
-              height={42}
-              className="rounded-full bg-white"
-            />
-            <div className="flex-1 text-left leading-tight">
-              <p className="font-medium">{blog.author}</p>
-              <p className="text-[12px] text-muted-foreground">
-                @{blog.author}
-              </p>
+      <div className="lg:grid lg:grid-cols-[16rem_1fr] lg:gap-16 xl:grid-cols-[18rem_1fr]">
+        {headings.length > 0 && (
+          <aside className="hidden lg:block">
+            <div className="sticky top-20">
+              <TableOfContents headings={headings} />
             </div>
-          </div>
+          </aside>
         )}
 
-        {blog.image && (
-          <Image
-            src={blog.image}
-            alt={blog.title}
-            width={720}
-            height={405}
-            priority
-            className="my-8 border bg-muted transition-colors"
-          />
-        )}
-        <Mdx code={blog.body} />
-        <hr className="mt-12" />
-        <div className="flex justify-center py-6 lg:py-10">
-          <Link
-            href="/blog"
-            className={cn(buttonVariants({ variant: "ghost" }))}
-          >
-            <ChevronLeft className="mr-2 size-4" />
-            See all Blogs
-          </Link>
+        <div>
+          {blog.image && (
+            <Image
+              src={blog.image}
+              alt={blog.title}
+              width={720}
+              height={405}
+              priority
+              className="mb-12 w-full"
+            />
+          )}
+
+          <Mdx source={blog.body} />
+
+          <footer className="mt-16 border-t border-border/40 pt-8">
+            <Link
+              href="/blog"
+              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              All posts
+            </Link>
+          </footer>
         </div>
       </div>
     </article>

@@ -11,17 +11,16 @@ interface MobileNavProps {
 
 export default function MobileNav({ onOpenChange }: MobileNavProps) {
   return (
-    <div className="fixed inset-0 top-16 z-50 grid h-[calc(100vh-4rem)] grid-flow-row auto-rows-max overflow-auto py-6 pb-32 shadow-md animate-in slide-in-from-bottom-80 md:hidden">
-      <div className="relative z-20  grid gap-6 rounded-md border border-secondary/80 bg-secondary p-4 text-popover-foreground shadow-md">
+    <div className="fixed inset-0 top-14 z-50 bg-background/95 backdrop-blur-sm md:hidden">
+      <div className="flex flex-col p-6">
         {NAV_LIST.map((item) => (
           <MobileLink
             key={item.label + item.path}
             href={item.path}
-            className="flex items-center"
+            className="border-b border-border/40 py-4 text-base last:border-0"
             onOpenChange={onOpenChange}
           >
-            <item.icon className="mr-2 size-4" />
-            <span>{item.label}</span>
+            {item.label}
           </MobileLink>
         ))}
       </div>
@@ -52,8 +51,10 @@ const MobileLink = ({
         onOpenChange?.();
       }}
       className={cn(
-        "transition-colors hover:text-primary",
-        pathname === href.toString() ? "text-primary" : "text-muted-foreground",
+        "transition-colors",
+        pathname === href.toString()
+          ? "text-foreground"
+          : "text-muted-foreground hover:text-foreground",
         className,
       )}
       {...props}
